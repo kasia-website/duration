@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hints</title>
+    <title>Duration</title>
 
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="custom.css">
@@ -17,87 +17,23 @@
 <li><a href="#get-it-now">Get it now</a></li>
 </ul>
 </nav>
-<h1>Hints - small javascript library to provide autocompletion help</h1>
+<h1>Duration - javascript helper to input duration</h1>
 <h2>Features</h2>
 <ul>
-<li>Fully responsive. Hints always stays on screen.</li>
-<li>Keyboard friendly. Assistive technology support with aria included.</li>
-<li>Customizable. Adding, removing, filtering hints as you wish.</li>
+<li>Feature 1.</li>
+<li>Feature 2.</li>
+<li>Feature 3.</li>
 </ul>
 <h2>Demos</h2>
-<h3>Simple hint list</h3>
-<p>Perfect to hint always the same items, independent of user input.</p>
+<h3>Simple example</h3>
+<p>Perfect for standard case.</p>
 <figure>
     <label>
-        <span>My favourite city in Germany (e.g. Köln, München, Nürnberg): </span>
-        <small>Press Ctrl + Space to show hints</small>
+        <span>How much time do you spend debugging every day?</span>
         <input id="demo-simple">
     </label>
-    <pre><code>new Hints('#demo-simple', {
-    hints:  ['ä', 'ö', 'ü', 'ß']
-});</code></pre>
-    <figcaption>Text input with hints for german letters "ä", "ö", "ü", "ß".</figcaption>
-</figure>
-<h3>Different hints for different triggers</h3>
-<p>Useful when only some hints should be displayed depending on user input.</p>
-<figure>
-    <label>
-        <span>My favourite region in Germany (e.g. Brandenburg, Sachsen):</span>
-        <input id="demo-triggers">
-    </label>
-    <pre><code>new Hints('#demo-triggers', {
-    behavior: 'replace',
-    hints: {
-        'B': ['Baden-Württemberg', 'Bayern', 'Berlin', 'Brandenburg', 'Bremen'],
-        'H': ['Hamburg', 'Hessen'],
-        'M': ['Mecklenburg-Vorpommern'],
-        'N': ['Niedersachsen', 'Nordrhein-Westfalen'],
-        'R': ['Rheinland-Pfalz'],
-        'S': ['Saarland', 'Sachsen', 'Sachsen-Anhalt', 'Schleswig-Holstein'],
-        'T': ['Thüringen']
-    }
-});</code></pre>
-    <figcaption>Text input with different hints depending on input value.</figcaption>
-</figure>
-<h3>Inline autocomplete</h3>
-<p>When you want to append hint value to the input.</p>
-<figure>
-    <label>
-        <span>My favourite region in Germany (e.g. Brandenburg, Sachsen):</span>
-        <input id="demo-inline-autocomplete">
-    </label>
-    <pre><code>new Hints('#demo-inline-autocomplete', {
-    behavior: 'replace',
-    hints: {
-        'B': ['Baden-Württemberg', 'Bayern', 'Berlin', 'Brandenburg', 'Bremen'],
-        'H': ['Hamburg', 'Hessen'],
-        'M': ['Mecklenburg-Vorpommern'],
-        'N': ['Niedersachsen', 'Nordrhein-Westfalen'],
-        'R': ['Rheinland-Pfalz'],
-        'S': ['Saarland', 'Sachsen', 'Sachsen-Anhalt', 'Schleswig-Holstein'],
-        'T': ['Thüringen']
-    },
-    inlineAutocomplete: true,
-});</code></pre>
-    <figcaption>Text input with different hints depending on input and inline autocomplete.</figcaption>
-</figure>
-<h3>Add & Remove</h3>
-<p>Update your hint list whenever you need it.</p>
-<figure>
-    <label>
-        <span>My favourite vegetable:</span>
-        <input id="demo-add-remove">
-    </label>
-    <pre><code>new Hints('#demo-add-remove', {
-    behavior: 'replace',
-    hints: {
-        'C': ['Cabbage', 'Carrot', 'Cucumber'],
-        'O': ['Onion'],
-        'P': ['Potato'],
-        'T': ['Tomato'],
-    }
-});</code></pre>
-    <figcaption>Text input with different hints depending on input and inline autocomplete.</figcaption>
+    <pre><code>new Duration('#demo-simple');</code></pre>
+    <figcaption>Text input with duration widget initialized.</figcaption>
 </figure>
 <h2>Getting started</h2>
 <ol>
@@ -107,20 +43,20 @@
     </figure>
 </li>
 <li>
-    <h3>Move /hints folder into your project.</h3>
+    <h3>Move /duration folder into your project.</h3>
 </li>
 <li>
-    <h3>Add hints.css in your head.</h3>
+    <h3>Add duration.css in your head.</h3>
     <figure>
     </figure>
 </li>
 <li>
-    <h3>Add hints.js before your closing body tag.</h3>
+    <h3>Add duration.js before your closing body tag.</h3>
     <figure>
     </figure>
 </li>
 <li>
-    <h3>Initialize hints.</h3>
+    <h3>Initialize duration.</h3>
     <figure>
     </figure>
 </li>
@@ -129,97 +65,16 @@
 <figure>
 </figure>
 <h2>Settings</h2>
-<ul class="list-with-margin">
-<li>
-    <p><strong>anyPosition</strong></p>
-    <p><b>Type:</b> boolean</p>
-    <p><b>Default:</b> false </p>
-    <p>If set to true any hint containing user input will be showed, no matter the position e.g. typing "cat" would match "concat"; If set to false only hints beginning with user input will be showed.</p>
-</li>
-<li>
-    <p><strong>behavior</strong></p>
-    <p><b>Type:</b> string</p>
-    <p><b>Default:</b> 'append' </p>
-    <p><b>Accepted:</b> 'append', 'replace', 'autocomplete'</p>
-    <p>If set to true any hint containing user input will be showed, no matter the position e.g. typing "cat" would match "concat"; If set to false only hints beginning with user input will be showed.</p>
-</li>
-<li>
-    <p><strong>caseSensitive</strong></p>
-    <p><b>Type:</b> boolean</p>
-    <p><b>Default:</b> true </p>
-    <p>If set to true any hint containing user input will be showed, no matter the position e.g. typing "cat" would match "concat"; If set to false only hints beginning with user input will be showed.</p>
-</li>
-<li>
-    <p><strong>emphasize</strong></p>
-    <p><b>Type:</b> boolean</p>
-    <p><b>Default:</b> true </p>
-    <p>If set to true any hint containing user input will be showed, no matter the position e.g. typing "cat" would match "concat"; If set to false only hints beginning with user input will be showed.</p>
-</li>
-<li>
-    <p><strong>focusOnOpen</strong></p>
-    <p><b>Type:</b> boolean</p>
-    <p><b>Default:</b> false </p>
-    <p>If set to true any hint containing user input will be showed, no matter the position e.g. typing "cat" would match "concat"; If set to false only hints beginning with user input will be showed.</p>
-</li>
-<li>
-    <p><strong>hints</strong></p>
-    <p><b>Type:</b> array</p>
-    <p><b>Default:</b> empty </p>
-    <p>If set to true any hint containing user input will be showed, no matter the position e.g. typing "cat" would match "concat"; If set to false only hints beginning with user input will be showed.</p>
-</li>
-<li>
-    <p><strong>offset</strong></p>
-    <p><b>Type:</b> number</p>
-    <p><b>Default:</b> 16 </p>
-    <p>Number of pixels between hint box and window boundaries.</p>
-</li>
-<li>
-    <p><strong>simplePositioning</strong></p>
-    <p><b>Type:</b> boolean</p>
-    <p><b>Default:</b> false </p>
-    <p>If set to true expensive positioning under cursor will we omitted and hint container's left edge will be aligned with input's left bottom corner.</p>
-</li>
-<li>
-    <p><strong>trigger</strong></p>
-    <p><b>Type:</b> string</p>
-    <p><b>Default:</b> '_' </p>
-    <p>Character or characters that trigger displaying of popup. If you want different triggers for different hint lists define them in <code>hints</code> setting. If you do so, you don't need to populate this setting.</code></p>
-</li>
-<li>
-    <p><strong>triggerLength</strong></p>
-    <p><b>Type:</b> integer</p>
-    <p><b>Default:</b> 1 </p>
-    <p>Number of characters that need to be typed before hint list gets displayed.</p>
-</li>
-<li>
-    <p><strong>version</strong></p>
-    <p><b>Type:</b> string</p>
-    <p><b>Default:</b> '1.0' </p>
-    <p><b>Accepted:</b> '1.0', '1.1' </p>
-    <p>This option corresponds to <a href="https://www.w3.org/TR/wai-aria-practices-1.1/#combobox">WAI ARIA</a> specification version.</p>
-</li>
-</ul>
-<h2>Events</h2>
 <ul>
 <li>
-    <p><strong>init</strong></p>
-    <p><b>Arguments:</b> hints </p>
-    <p>Fires after first initialization.</p>
+    <p><strong>loremIpsum</strong></p>
+    <p><b>Type:</b> boolean</p>
+    <p><b>Default:</b> false </p>
+    <p>Lorem ipsum</p>
 </li>
 </ul>
-<h2>Methods</h2>
-<ul>
-<li>
-    <p><strong>add</strong></p>
-    <p><b>Arguments:</b> new hint or hints; string, array or Object</p>
-    <p>Add new hints.</p>
-</li>
-</ul>
-<h2>Get it now</h2>
-<a href="#">Download now</a>
-<a href="#">View on Github</a>
 
-<script src="hints.js"></script>
+<script src="duration.js"></script>
 <script src="main.js"></script>
 </body>
 </html>
