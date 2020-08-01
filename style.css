@@ -142,7 +142,6 @@ input {
 
 input:focus,
 textarea:focus {
-    background: var(--custom-3);
     border-color: var(--custom-focus);
     box-shadow: 0 0 6px 3px var(--custom-4);
     outline: none;
@@ -151,11 +150,6 @@ textarea:focus {
 textarea {
     padding: 1em;
     min-height: 20em;
-}
-
-input,
-textarea {
-    background: var(--custom-3);
 }
 
 code {

@@ -1,7 +1,7 @@
 :root {
-    --custom-1: #D93D4A;
+    --custom-1: #049DBF;
     --custom-2: #F2CED1;
-    --custom-3: #049DBF;
+    --custom-3: #D93D4A;
     --custom-4: #F2C84B;
     --custom-5: #D98E04;
 }
@@ -28,6 +28,41 @@ label input {
     margin-top: 0.5rem;
 }
 
-.list-with-margin strong {
-    font-size: 1.1em;
+.duration-container {
+    background: white;
+    border: 2px solid var(--custom-1);
+    display: inline-flex;
+    width: 320px;
+}
+
+.duration-container label {
+    align-items: baseline;
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.duration-container * + label {
+    margin-top: 0;
+}
+
+.duration-container input {
+    box-sizing: content-box;
+    border: none;
+    margin: 0;
+    text-align: right;
+    width: 2ch;
+}
+
+.duration-container input:focus {
+    background: var(--custom-2);
+    box-shadow: none;
+}
+
+.duration-container input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.duration-container input::-webkit-outer-spin-button,
+.duration-container input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
 }
