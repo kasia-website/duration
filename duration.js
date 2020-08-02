@@ -227,8 +227,6 @@ Duration.prototype.setupPopup = function() {
 Duration.prototype.setupSwitcher = function() {
     let _ = this, switcher;
 
-    console.log(_.options);
-
     switcher = document.createElement('button');
     switcher.setAttribute('type', 'button');
     switcher.classList.add('switcher');
