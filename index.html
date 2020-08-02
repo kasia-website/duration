@@ -35,6 +35,72 @@
     <pre><code>new Duration('#demo-simple');</code></pre>
     <figcaption>Text input with duration widget initialized.</figcaption>
 </figure>
+<h3>Preset value</h3>
+<p>Set default value.</p>
+<figure>
+    <label>
+        <span>How much time do you spend debugging every day?</span>
+        <input id="demo-initial-value">
+    </label>
+    <pre><code>new Duration('#demo-initial-value', {
+    initialValue: {
+        'minutes': '30',
+        'hours':   '1'
+    }
+});</code></pre>
+    <figcaption>Text input with duration widget initialized.</figcaption>
+</figure>
+<h3>Custom labels</h3>
+<p>Label hours, minutes etc. as you wish. Useful for internationalization.</p>
+<figure>
+    <label>
+        <span>How much time do you spend debugging every day?</span>
+        <input id="demo-labels">
+    </label>
+    <pre><code>new Duration('#demo-labels', {
+    labels: {
+        minutes: 'minutes',
+        hours  : 'hours'
+    },
+});</code></pre>
+    <figcaption>Text input with duration widget initialized.</figcaption>
+</figure>
+<h3>Hide original input</h3>
+<p>Hide original input from users.</p>
+<figure>
+    <label>
+        <span>How much time do you spend debugging every day?</span>
+        <input id="demo-widget">
+    </label>
+    <pre><code>new Duration('#demo-widget', {
+    display: 'widget'
+});</code></pre>
+    <figcaption>Text input with duration widget initialized.</figcaption>
+</figure>
+<h3>Display as popup</h3>
+<p>Show widget when original input gets focus.</p>
+<figure>
+    <label>
+        <span>How much time do you spend debugging every day?</span>
+        <input id="demo-popup">
+    </label>
+    <pre><code>new Duration('#demo-popup', {
+    display: 'popup'
+});</code></pre>
+    <figcaption>Text input with duration widget initialized.</figcaption>
+</figure>
+<h3>Switcher</h3>
+<p>Let users decide how they want to input values.</p>
+<figure>
+    <label>
+        <span>How much time do you spend debugging every day?</span>
+        <input id="demo-switcher">
+    </label>
+    <pre><code>new Duration('#demo-switcher', {
+    display: 'switcher'
+});</code></pre>
+    <figcaption>Text input with duration widget initialized.</figcaption>
+</figure>
 <h2>Getting started</h2>
 <ol>
 <li>

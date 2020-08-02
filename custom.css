@@ -66,3 +66,70 @@ label input {
 .duration-container input::-webkit-inner-spin-button {
     -webkit-appearance: none;
 }
+
+.switcher {
+    --color-1: white;
+    --color-2: var(--custom-1);
+
+    background: var(--color-1);
+    border: 1px solid;
+    border-color: var(--color-2);
+    border-radius: 1rem;
+    color: #222;
+    display: inline-grid;
+    font-size: 0.85em;
+    font-weight: normal;
+    grid-template-areas: 'on label off';
+    grid-template-columns: 1.5rem max-content 1.5rem;
+    line-height: 1rem;
+    padding: 0.25rem 0.75rem;
+    position: relative;
+    text-transform: initial;
+    transition: 0.5s;
+    width: max-content;
+}
+
+.switcher:focus {
+    background-color: var(--color-1);
+}
+
+.switcher > * {
+    grid-area: label;
+    margin: 0;
+}
+
+.switcher > [aria-hidden] {
+    visibility: hidden;
+}
+
+.switcher::after {
+    background: var(--color-2);
+    border-radius: 50%;
+    bottom: 1px;
+    content: '';
+    left: 1px;
+    padding: 0;
+    position: absolute;
+    top: 1px;
+    transition: 0.5s;
+    width: calc(1.5rem - 2px);
+}
+
+.switcher.second {
+    background: var(--color-2);
+    color: var(--color-1);
+}
+
+.switcher.second::after {
+    background: var(--color-1);
+    left: calc(100% - 1.5rem + 1px);
+}
+
+.switcher + input {
+    margin-top: 0;
+}
+
+.duration-container {
+    display: flex;
+    margin-top: 0;
+}
