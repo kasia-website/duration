@@ -1,10 +1,30 @@
 let Duration = (function() {
     function Duration(element, settings) {
-        let _ = this;
+        let _ = this, deepProperties;
+
+        _.consts = {
+            /* display */
+            DISPLAY_BOTH:     'both',
+            DISPLAY_WIDGET:   'widget',
+            DISPLAY_POPUP:    'popup',
+            DISPLAY_SWITCHER: 'switcher',
+
+            /* output format */
+            FORMAT_DECIMAL: 'decimal',
+            FORMAT_ISO:     'iso',
+
+            /* switcher states */
+            SWITCHER_STATE_FIRST:  'first',
+            SWITCHER_STATE_SECOND: 'second',
+
+            /* switcher label assignment */
+            SHOWS_ALTERNATIVE: 'alternative',
+            SHOWS_CURRENT:     'current'
+        }
 
         _.defaults = {
             cssClass: 'duration-initialized',
-            display: 'both', // or 'widget' or 'popup' or 'switcher'
+            display: _.consts.DISPLAY_BOTH,
             labels: {
                 seconds: 'sec',
                 minutes: 'min',
@@ -16,12 +36,12 @@ let Duration = (function() {
                 hours:   '0'
             },
             leadingZeroes: false,
-            outputFormat: 'industriestunden', // or 'iso'
+            outputFormat: _.consts.FORMAT_DECIMAL,
             switcher: {
-                labelShows: 'alternative', //or current
+                labelShows: _.consts.SHOWS_ALTERNATIVE,
                 firstLabel: 'Switch to input widget',
                 secondLabel: 'Switch to preformatted value input',
-                initialState: 'first'
+                initialState: _.consts.SWITCHER_STATE_FIRST
             }
         }
 
@@ -33,29 +53,19 @@ let Duration = (function() {
             ..._.defaults,
             ...settings
         };
-        
-        if (settings.hasOwnProperty('initialValue')) {
-           _.options.initialValue = {
-               ..._.defaults.initialValue,
-               ...settings.initialValue
-           };
-        }
-        
-        if (settings.hasOwnProperty('switcher')) {
-            _.options.switcher = {
-                ..._.defaults.switcher,
-                ...settings.switcher
-            };
-        }
-        
-        if (settings.hasOwnProperty('labels')) {
-            _.options.labels = {
-                ..._.defaults.labels,
-                ...settings.labels
-            };
+
+        /* deep merge patch */
+        deepProperties = ['initialValue', 'labels', 'switcher'];
+        for (let property in deepProperties) {
+            if (settings.hasOwnProperty(property)) {
+                _.options[property] = {
+                    ..._.defaults[property],
+                    ...settings[property]
+                };
+            }
         }
 
-        if (_.options.display === 'switcher' && _.options.switcher.labelShows === 'current' ) {
+        if (_.options.display === _.consts.DISPLAY_SWITCHER && _.options.switcher.labelShows === _.consts.SHOWS_CURRENT ) {
             let tmp = _.options.switcher.firstLabel;
             _.options.switcher.firstLabel = _.options.switcher.secondLabel;
             _.options.switcher.secondLabel = tmp;
@@ -65,7 +75,11 @@ let Duration = (function() {
         _.containerCssClass = 'duration-container';
         _.source    = element instanceof HTMLElement ? element : document.querySelector(element);
         _.switcher = undefined;
-        _.switcherState = _.options.display === 'switcher' ? _.options.switcher.initialState === 'first' ? 'first' : 'second' : undefined;
+        _.switcherState = _.options.display === _.consts.DISPLAY_SWITCHER
+            ? _.options.switcher.initialState === _.consts.SWITCHER_STATE_FIRST
+                ? _.consts.SWITCHER_STATE_FIRST
+                : _.consts.SWITCHER_STATE_SECOND
+            : undefined;
 
         _.init();
     }
@@ -124,15 +138,15 @@ Duration.prototype.buildWidget = function() {
     _.container = container;
 
     switch (_.options.display) {
-        case 'widget':
+        case _.consts.DISPLAY_WIDGET:
             _.source.style.setProperty('display', 'none');
             break;
 
-        case 'popup':
+        case _.consts.DISPLAY_POPUP:
             _.setupPopup();
             break;
 
-        case 'switcher':
+        case _.consts.DISPLAY_SWITCHER:
             _.setupSwitcher();
             break;
     }
@@ -179,10 +193,10 @@ Duration.prototype.setSourceValue = function() {
     let _ = this, value;
 
     switch(_.options.outputFormat) {
-        case 'industriestunden':
+        case _.consts.FORMAT_DECIMAL:
             value = _.hours.value + ',' + Math.floor(_.minutes.value * 100 / 60);
             break;
-        case 'iso':
+        case _.consts.FORMAT_ISO:
             value = 'PT';
 
             if (_.hours.value > 0) {
@@ -193,7 +207,7 @@ Duration.prototype.setSourceValue = function() {
                 value += _.minutes.value + 'M';
             }
 
-            value += Math.floor(_.seconds.value) + 'S';
+            //value += Math.floor(_.seconds.value) + 'S';
             break;
     }
 
@@ -231,8 +245,8 @@ Duration.prototype.setupSwitcher = function() {
     switcher.setAttribute('type', 'button');
     switcher.classList.add('switcher');
     switcher.classList.add(_.options.switcher.initialState);
-    switcher.innerHTML = '<span>' + _.options.switcher.firstLabel + '</span>' +
-                         '<span>' + _.options.switcher.secondLabel + '</span>';
+    switcher.innerHTML = '<span id="' + _.generateId() +'">' + _.options.switcher.firstLabel + '</span>' +
+                         '<span id="' + _.generateId() + '">' + _.options.switcher.secondLabel + '</span>';
 
     _.switcher = switcher;
     _.source.insertAdjacentElement('beforebegin', switcher);

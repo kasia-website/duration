@@ -4,7 +4,8 @@ new Duration('#demo-initial-value', {
     initialValue: {
         minutes: '30',
         hours:   '1'
-    }
+    },
+    outputFormat: 'iso'
 });
 
 new Duration('#demo-labels', {
