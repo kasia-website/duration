@@ -60,7 +60,8 @@ let Duration = (function() {
                 firstLabel: 'Switch to input widget',
                 secondLabel: 'Switch to preformatted value input',
                 initialState: _.consts.SWITCHER_STATE_FIRST
-            }
+            },
+            wrapper: false
         }
 
         if (!settings || !settings instanceof Object) {
@@ -98,13 +99,32 @@ let Duration = (function() {
         _.hours = undefined;
         _.inputs = [];
         _.minutes = undefined;
-        _.source    = element instanceof HTMLElement ? element : document.querySelector(element);
+        _.popupVisible = false;
+        _.source = element instanceof HTMLElement ? element : document.querySelector(element);
         _.switcher = undefined;
         _.switcherState = _.options.display === _.consts.DISPLAY_SWITCHER
             ? _.options.switcher.initialState === _.consts.SWITCHER_STATE_FIRST
                 ? _.consts.SWITCHER_STATE_FIRST
                 : _.consts.SWITCHER_STATE_SECOND
             : undefined;
+
+
+        //HTML structure
+
+        //user specified a wrapper, easy
+        if (_.options.wrapper) {
+            _.options.wrapper = _.options.wrapper instanceof HTMLElement ? _.options.wrapper : document.querySelector(element);
+        //label wraps input; let's wrap it again to contain label and sibling container for widget
+        } else if (_.source.closest('label')){
+            _.options.wrapper = document.createElement('div');
+            _.source.closest('label').parentNode.appendChild(_.options.wrapper);
+            _.options.wrapper.appendChild(_.source.closest('label'));
+        //let's wrap input in a div and append widget as sibling
+        } else {
+            _.options.wrapper = document.createElement('div');
+            _.source.parentNode.appendChild(_.options.wrapper);
+            _.options.wrapper.appendChild(_.source);
+        }
 
         _.init();
     }
@@ -119,20 +139,16 @@ Duration.prototype.buildWidget = function() {
     container.setAttribute('id', _.generateId());
     container.classList.add(_.containerCssClass);
     _.container = container;
+    _.options.wrapper.appendChild(_.container);
 
     _.options.inputs.forEach(function(period) {
         _.setupPeriod(period);
     });
-    
-    if (_.source.closest('label')) {
-        _.source.closest('label').insertAdjacentElement('afterend', container);
-    } else {
-        _.source.insertAdjacentElement('afterend', container);
-    }
+
 
     switch (_.options.display) {
         case _.consts.DISPLAY_WIDGET:
-            _.source.style.setProperty('display', 'none');
+            _.source.setAttribute('type', 'hidden');
             break;
 
         case _.consts.DISPLAY_POPUP:
@@ -174,10 +190,26 @@ Duration.prototype.handleInput = function(event) {
     }
 }
 
+Duration.prototype.handlePopup = function(event) {
+    let _ = this;
+
+    if (_.options.wrapper.contains(event.target)) {
+        _.showPopup();
+        return;
+    }
+
+    _.hidePopup();
+}
+
 Duration.prototype.hidePopup = function() {
     let _ = this;
 
+    window.removeEventListener('scroll', _.hidePopup.bind(_));
+    window.removeEventListener('resize', _.hidePopup.bind(_));
+
     _.container.style.setProperty('display', 'none');
+
+    _.popupVisible = false;
 }
 
 Duration.prototype.initializeEvents = function() {
@@ -273,6 +305,13 @@ Duration.prototype.showPopup = function() {
     _.container.style.setProperty('top', (+rect.top + +rect.height) + 'px');
 
     _.container.style.removeProperty('display');
+
+    if (!_.popupVisible) {
+        window.addEventListener('scroll', _.hidePopup.bind(_));
+        window.addEventListener('resize', _.hidePopup.bind(_));
+    }
+
+    _.popupVisible = true;
 }
 
 Duration.prototype.setupPopup = function() {
@@ -280,9 +319,8 @@ Duration.prototype.setupPopup = function() {
 
     _.container.style.setProperty('display', 'none');
 
-    _.source.addEventListener('focus', _.showPopup.bind(_));
-    window.addEventListener('scroll', _.hidePopup.bind(_));
-    window.addEventListener('resize', _.hidePopup.bind(_));
+    document.addEventListener('focus', _.handlePopup.bind(_), true);
+    document.addEventListener('click', _.handlePopup.bind(_));
 }
 
 Duration.prototype.setupSwitcher = function() {
