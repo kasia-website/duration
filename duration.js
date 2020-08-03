@@ -249,47 +249,14 @@ Duration.prototype.setupPeriod = function(period) {
 }
 
 Duration.prototype.setWidgetValue = function() {
-    let _ = this, value;
+    let _ = this;
 
     switch(_.options.outputFormat) {
         case _.consts.FORMAT_DECIMAL:
-            let hours = Math.floor(_.source.value);
-            let minutes = _.source.value - hours;
-
-            if (_.inputs[0].getAttribute('data-designator') === _.consts.DESIGNATOR_HOURS) {
-                _.inputs[0].value = hours;
-            }
-            if (_.inputs[1].getAttribute('data-designator') === _.consts.DESIGNATOR_MINUTES) {
-                _.inputs[1].value = Math.floor(minutes * 60);
-            }
+            _.updateDecimalWidget();
             break;
         case _.consts.FORMAT_ISO:
-            let values = _.source.value.split(/([TYMWDHS]|\d+)/);
-
-            values = values.filter(function(value) {
-                return value.length > 0;
-            });
-
-            _.inputs.forEach(function(input) {
-               let designator = input.getAttribute('data-designator');
-
-               if (designator === 'm') {
-                   let index = values.indexOf('M');
-                   let T = values.indexOf('T');
-                   if (index > -1 && index < T && Math.floor(values[index - 1]) > 0) {
-                        input.value = Math.floor(values[index - 1]);
-                   } else {
-                       input.value = 0;
-                   }
-               } else {
-                   let index = values.lastIndexOf(designator);
-                   if (index > -1 && Math.floor(values[index - 1]) > 0) {
-                       input.value = Math.floor(values[index - 1]);
-                   } else {
-                       input.value = 0;
-                   }
-               }
-            });
+            _.updateIsoWidget();
             break;
     }
 }
@@ -397,6 +364,54 @@ Duration.prototype.setupSwitcher = function() {
 
     });
 
+}
+
+Duration.prototype.updateDecimalWidget = function() {
+    let _ = this, hours, minutes;
+
+    hours = Math.floor(_.source.value);
+    minutes = _.source.value - hours;
+
+    if (_.inputs[0].getAttribute('data-designator') === _.consts.DESIGNATOR_HOURS) {
+        _.inputs[0].value = hours;
+    }
+
+    if (_.inputs[1].getAttribute('data-designator') === _.consts.DESIGNATOR_MINUTES) {
+        _.inputs[1].value = Math.floor(minutes * 60);
+    }
+}
+
+Duration.prototype.updateIsoWidget = function() {
+    let _ = this, values, designator, value, index, T;
+
+    values = _.source.value.split(/([TYMWDHS]|\d+)/);
+
+    values = values.filter(function(value) {
+        return value.length > 0;
+    });
+
+    _.inputs.forEach(function(input) {
+        designator = input.getAttribute('data-designator');
+
+        value = 0;
+
+        //months
+        if (designator === 'm') {
+            index = values.indexOf('M');
+            T = values.indexOf('T');
+            if (index > 0 && index < T && Math.floor(values[index - 1]) > 0) {
+                value = Math.floor(values[index - 1]);
+            }
+        //everything else, particularly minutes
+        } else {
+            index = values.lastIndexOf(designator);
+            if (index > 0 && Math.floor(values[index - 1]) > 0) {
+                value = Math.floor(values[index - 1]);
+            }
+        }
+
+        input.value = value;
+    });
 }
 
 Duration.prototype.init = function() {
