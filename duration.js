@@ -54,7 +54,7 @@ let Duration = (function() {
             },
             inputs: ['years', 'months', 'weeks', 'days', 'hours', 'minutes', 'seconds'],
             leadingZeroes: false,
-            outputFormat: _.consts.FORMAT_DECIMAL,
+            outputFormat: _.consts.FORMAT_ISO,
             switcher: {
                 labelShows: _.consts.SHOWS_ALTERNATIVE,
                 firstLabel: 'Switch to input widget',
@@ -83,6 +83,10 @@ let Duration = (function() {
             }
         });
 
+        if (_.options.outputFormat === _.consts.FORMAT_DECIMAL) {
+            _.options.inputs = ['hours', 'minutes'];
+        }
+
         if (_.options.display === _.consts.DISPLAY_SWITCHER && _.options.switcher.labelShows === _.consts.SHOWS_CURRENT ) {
             let tmp = _.options.switcher.firstLabel;
             _.options.switcher.firstLabel = _.options.switcher.secondLabel;
@@ -91,7 +95,9 @@ let Duration = (function() {
 
         _.container =  undefined;
         _.containerCssClass = 'duration-container';
+        _.hours = undefined;
         _.inputs = [];
+        _.minutes = undefined;
         _.source    = element instanceof HTMLElement ? element : document.querySelector(element);
         _.switcher = undefined;
         _.switcherState = _.options.display === _.consts.DISPLAY_SWITCHER
@@ -159,8 +165,12 @@ Duration.prototype.generateId = function() {
 Duration.prototype.handleInput = function(event) {
     let _ = this;
 
-    if (event.target.closest('.' + _.containerCssClass)) {
+    if (event.target.matches('[data-designator]')) {
         _.setSourceValue();
+    }
+
+    if(event.target === _.source) {
+        _.setWidgetValue();
     }
 }
 
@@ -243,13 +253,45 @@ Duration.prototype.setWidgetValue = function() {
 
     switch(_.options.outputFormat) {
         case _.consts.FORMAT_DECIMAL:
-            values = _.source.value.split('.');
+            let hours = Math.floor(_.source.value);
+            let minutes = _.source.value - hours;
+
+            if (_.inputs[0].getAttribute('data-designator') === _.consts.DESIGNATOR_HOURS) {
+                _.inputs[0].value = hours;
+            }
+            if (_.inputs[1].getAttribute('data-designator') === _.consts.DESIGNATOR_MINUTES) {
+                _.inputs[1].value = Math.floor(minutes * 60);
+            }
             break;
         case _.consts.FORMAT_ISO:
+            let values = _.source.value.split(/([TYMWDHS]|\d+)/);
+
+            values = values.filter(function(value) {
+                return value.length > 0;
+            });
+
+            _.inputs.forEach(function(input) {
+               let designator = input.getAttribute('data-designator');
+
+               if (designator === 'm') {
+                   let index = values.indexOf('M');
+                   let T = values.indexOf('T');
+                   if (index > -1 && index < T && Math.floor(values[index - 1]) > 0) {
+                        input.value = Math.floor(values[index - 1]);
+                   } else {
+                       input.value = 0;
+                   }
+               } else {
+                   let index = values.lastIndexOf(designator);
+                   if (index > -1 && Math.floor(values[index - 1]) > 0) {
+                       input.value = Math.floor(values[index - 1]);
+                   } else {
+                       input.value = 0;
+                   }
+               }
+            });
             break;
     }
-
-    _.source.value = value;
 }
 
 Duration.prototype.showPopup = function() {

@@ -1,4 +1,4 @@
-new Duration('#demo-simple', {inputs: ['hours', 'minutes']});
+new Duration('#demo-simple', {outputFormat: 'decimal'});
 
 new Duration('#demo-initial-value', {
     initialValue: {
@@ -10,30 +10,30 @@ new Duration('#demo-initial-value', {
 });
 
 new Duration('#demo-labels', {
-    inputs: ['hours', 'minutes'],
     labels: {
         minutes: 'minutes',
         hours  : 'hours'
     },
+    outputFormat: 'decimal'
 });
 
 new Duration('#demo-widget', {
     display: 'widget',
-    inputs: ['hours', 'minutes'],
     labels: {
         minutes: 'even longer minutes',
         hours  : 'long hours'
     },
+    outputFormat: 'decimal'
 });
 
 new Duration('#demo-popup', {
     display: 'popup',
-    inputs: ['hours', 'minutes']
+    outputFormat: 'decimal'
 });
 
 new Duration('#demo-switcher', {
     display: 'switcher',
-    inputs: ['hours', 'minutes'],
+    outputFormat: 'decimal',
     switcher: {
         firstLabel: 'Industriezeit',
         secondLabel: 'normale Zeit'
