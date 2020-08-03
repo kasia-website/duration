@@ -3,6 +3,15 @@ let Duration = (function() {
         let _ = this, deepProperties;
 
         _.consts = {
+            /* iso */
+            DESIGNATOR_YEARS:   'Y',
+            DESIGNATOR_MONTHS:  'm',
+            DESIGNATOR_WEEKS:   'W',
+            DESIGNATOR_DAYS:    'D',
+            DESIGNATOR_HOURS:   'H',
+            DESIGNATOR_MINUTES: 'M',
+            DESIGNATOR_SECONDS: 'S',
+
             /* display */
             DISPLAY_BOTH:     'both',
             DISPLAY_WIDGET:   'widget',
@@ -26,15 +35,24 @@ let Duration = (function() {
             cssClass: 'duration-initialized',
             display: _.consts.DISPLAY_BOTH,
             labels: {
-                seconds: 'sec',
+                years:   'yrs',
+                months:  'mo',
+                weeks:   'wks',
+                days:    'days',
+                hours:   'hrs',
                 minutes: 'min',
-                hours  : 'hrs'
+                seconds: 'sec'
             },
             initialValue: {
-                seconds: '0',
+                years:   '0',
+                months:  '0',
+                weeks:   '0',
+                days:    '0',
+                hours:   '0',
                 minutes: '0',
-                hours:   '0'
+                seconds: '0'
             },
+            inputs: ['years', 'months', 'weeks', 'days', 'hours', 'minutes', 'seconds'],
             leadingZeroes: false,
             outputFormat: _.consts.FORMAT_DECIMAL,
             switcher: {
@@ -56,14 +74,14 @@ let Duration = (function() {
 
         /* deep merge patch */
         deepProperties = ['initialValue', 'labels', 'switcher'];
-        for (let property in deepProperties) {
+        deepProperties.forEach(function(property) {
             if (settings.hasOwnProperty(property)) {
                 _.options[property] = {
                     ..._.defaults[property],
                     ...settings[property]
                 };
             }
-        }
+        });
 
         if (_.options.display === _.consts.DISPLAY_SWITCHER && _.options.switcher.labelShows === _.consts.SHOWS_CURRENT ) {
             let tmp = _.options.switcher.firstLabel;
@@ -73,6 +91,7 @@ let Duration = (function() {
 
         _.container =  undefined;
         _.containerCssClass = 'duration-container';
+        _.inputs = [];
         _.source    = element instanceof HTMLElement ? element : document.querySelector(element);
         _.switcher = undefined;
         _.switcherState = _.options.display === _.consts.DISPLAY_SWITCHER
@@ -88,54 +107,22 @@ let Duration = (function() {
 }());
 
 Duration.prototype.buildWidget = function() {
-    let _ = this, container, hours, hoursText, hoursInput, minutes, minutesText, minutesInput;
+    let _ = this, container, period;
 
     container = document.createElement('div');
     container.setAttribute('id', _.generateId());
     container.classList.add(_.containerCssClass);
+    _.container = container;
 
-    hours = document.createElement('label');
-    hours.setAttribute('data-duration','H');
-
-    hoursText = document.createElement('span');
-    hoursText.innerText = _.options.labels['hours'];
-    hours.appendChild(hoursText);
-
-    hoursInput = document.createElement('input');
-    hoursInput.setAttribute('type', 'number');
-    hoursInput.setAttribute('min', '0');
-    hoursInput.setAttribute('step', '1');
-    hoursInput.value = _.options.initialValue['hours'];
-    _.hours = hoursInput;
-    hours.appendChild(hoursInput);
-
-    container.appendChild(hours);
-
-    minutes = document.createElement('label');
-    minutes.setAttribute('data-duration', 'M');
-
-    minutesText = document.createElement('span');
-    minutesText.innerText = _.options.labels['minutes'];
-    minutes.appendChild(minutesText);
-
-    minutesInput = document.createElement('input');
-    minutesInput.setAttribute('type', 'number');
-    minutesInput.setAttribute('min', '0');
-    minutesInput.setAttribute('max', '59');
-    minutesInput.setAttribute('step', '1');
-    minutesInput.value = _.options.initialValue['minutes'];
-    _.minutes = minutesInput;
-    minutes.appendChild(minutesInput);
-
-    container.appendChild(minutes);
-
+    _.options.inputs.forEach(function(period) {
+        _.setupPeriod(period);
+    });
+    
     if (_.source.closest('label')) {
         _.source.closest('label').insertAdjacentElement('afterend', container);
     } else {
         _.source.insertAdjacentElement('afterend', container);
     }
-
-    _.container = container;
 
     switch (_.options.display) {
         case _.consts.DISPLAY_WIDGET:
@@ -194,20 +181,71 @@ Duration.prototype.setSourceValue = function() {
 
     switch(_.options.outputFormat) {
         case _.consts.FORMAT_DECIMAL:
-            value = _.hours.value + ',' + Math.floor(_.minutes.value * 100 / 60);
+            value = '0';
+            _.inputs.forEach(function(input) {
+                if (input.getAttribute('data-designator') === 'H' && input.value > 0) {
+                    value = input.value;
+                }
+                if (input.getAttribute('data-designator') === 'M') {
+                    value += '.' + Math.floor(input.value * 100 / 60);
+                }
+            });
             break;
         case _.consts.FORMAT_ISO:
-            value = 'PT';
+            value = 'P';
+            const designators = ['Y', 'm', 'W', 'D'];
+            let insertTime = true;
 
-            if (_.hours.value > 0) {
-                value += _.hours.value + 'H';
+            _.inputs.forEach(function(input) {
+                if (designators.indexOf(input.getAttribute('data-designator')) < 0 && insertTime) {
+                   value += 'T';
+                   insertTime = false;
+                }
+                if (input.value > 0) {
+                    value += input.value + input.getAttribute('data-designator').toUpperCase();
+                }
+            });
+
+            if (value === 'PT') {
+                value += '0S';
             }
 
-            if (_.minutes.value > 0) {
-                value += _.minutes.value + 'M';
-            }
+            break;
+    }
 
-            //value += Math.floor(_.seconds.value) + 'S';
+    _.source.value = value;
+}
+
+Duration.prototype.setupPeriod = function(period) {
+    let _ = this, periodContainer, periodLabelText, periodInput;
+
+    periodContainer = document.createElement('label');
+
+    periodLabelText = document.createElement('span');
+    periodLabelText.innerText = _.options.labels[period];
+    periodContainer.appendChild(periodLabelText);
+
+    periodInput = document.createElement('input');
+
+    periodInput.setAttribute('data-designator', _.consts['DESIGNATOR_' + period.toUpperCase()]);
+    periodInput.setAttribute('type', 'number');
+    periodInput.setAttribute('min', '0');
+    periodInput.setAttribute('step', '1');
+    periodInput.value = _.options.initialValue[period];
+    periodContainer.appendChild(periodInput);
+    _.inputs.push(periodInput);
+
+    _.container.appendChild(periodContainer);
+}
+
+Duration.prototype.setWidgetValue = function() {
+    let _ = this, value;
+
+    switch(_.options.outputFormat) {
+        case _.consts.FORMAT_DECIMAL:
+            values = _.source.value.split('.');
+            break;
+        case _.consts.FORMAT_ISO:
             break;
     }
 
@@ -239,19 +277,58 @@ Duration.prototype.setupPopup = function() {
 }
 
 Duration.prototype.setupSwitcher = function() {
-    let _ = this, switcher;
+    let _ = this, template, oldLabel, oldLabelText, firstId, secondId, switcherId, containerId, originalInputClone;
 
-    switcher = document.createElement('button');
-    switcher.setAttribute('type', 'button');
-    switcher.classList.add('switcher');
-    switcher.classList.add(_.options.switcher.initialState);
-    switcher.innerHTML = '<span id="' + _.generateId() +'">' + _.options.switcher.firstLabel + '</span>' +
-                         '<span id="' + _.generateId() + '">' + _.options.switcher.secondLabel + '</span>';
+    firstId  = _.generateId();
+    secondId = _.generateId();
+    switcherId = _.generateId();
+    containerId = _.generateId();
 
-    _.switcher = switcher;
-    _.source.insertAdjacentElement('beforebegin', switcher);
+    originalInputClone = _.source.cloneNode();
 
-    if (_.switcherState === 'first') {
+    oldLabelText = '';
+    if (originalInputClone.hasAttribute('id')) {
+        oldLabel = document.querySelector('[for="' + _.source.getAttribute('id') + '"]');
+        if (oldLabel) {
+            oldLabelText = oldLabel.textContent;
+            oldLabel.style.setProperty('display', 'none');
+        }
+    }
+
+    template = '<fieldset>';
+
+    if (oldLabelText.length > 0) {
+        template += '<legend>' + oldLabelText + '</legend>';
+    }
+
+    template += '<button type="button" class="switcher" id="' + switcherId + '">' +
+                    '<span id="' + firstId + '">' + _.options.switcher.firstLabel +'</span>' +
+                    '<span id="' + secondId + '">' + _.options.switcher.secondLabel +'</span>' +
+                '</button>';
+
+    originalInputClone.removeAttribute('id');
+    originalInputClone.setAttribute('aria-describedby', firstId);
+
+    template += originalInputClone.outerHTML;
+
+    template += '<div class="' + _.options.cssClass + '" id="' + containerId + '">' +
+                    '<label>' +
+                        '<span>' + _.options.labels.hours + '</span>' +
+                        '<input type="number" aria-describedby="' + secondId +'">' +
+                    '</label>' +
+                    '<label>' +
+                        '<span>' + _.options.labels.minutes + '</span>' +
+                        '<input type="number" aria-describedby="' + secondId +'">' +
+                    '</label>' +
+                '</div>'
+
+    template += '</fieldset>';
+    _.source.insertAdjacentHTML('afterend', template);
+
+    _.switcher = document.getElementById(switcherId);
+    _.container = document.getElementById(containerId);
+
+    if (_.switcherState === _.consts.SWITCHER_STATE_FIRST) {
         _.switcher.lastElementChild.setAttribute('aria-hidden', 'true');
         _.container.style.setProperty('display', 'none');
     } else {
@@ -259,21 +336,21 @@ Duration.prototype.setupSwitcher = function() {
         _.source.style.setProperty('display', 'none');
     }
 
-    switcher.addEventListener('click', function(event) {
-       if (_.switcherState === 'first') {
+    _.switcher.addEventListener('click', function(event) {
+       if (_.switcherState === _.consts.SWITCHER_STATE_FIRST) {
            _.source.style.setProperty('display', 'none');
            _.container.style.removeProperty('display');
            _.switcher.lastElementChild.removeAttribute('aria-hidden');
            _.switcher.firstElementChild.setAttribute('aria-hidden', 'true');
-           _.switcher.classList.add('second');
-           _.switcherState = 'second';
+           _.switcher.classList.add(_.consts.SWITCHER_STATE_SECOND);
+           _.switcherState = _.consts.SWITCHER_STATE_SECOND;
        } else {
            _.source.style.removeProperty('display');
            _.container.style.setProperty('display', 'none');
            _.switcher.lastElementChild.setAttribute('aria-hidden', 'true');
            _.switcher.firstElementChild.removeAttribute('aria-hidden');
-           _.switcher.classList.remove('second');
-           _.switcherState = 'first';
+           _.switcher.classList.remove(_.consts.SWITCHER_STATE_SECOND);
+           _.switcherState = _.consts.SWITCHER_STATE_FIRST;
        }
 
     });
