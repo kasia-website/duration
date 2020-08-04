@@ -95,6 +95,7 @@ let Duration = (function() {
             _.options.switcher.secondLabel = tmp;
         }
 
+        _.additionalContainer = undefined;
         _.container =  undefined;
         _.containerCssClass = 'duration-container';
         _.hours = undefined;
@@ -143,6 +144,16 @@ let Duration = (function() {
 Duration.prototype.buildWidget = function() {
     let _ = this, container, innerContainer;
 
+    if (_.options.display === _.consts.DISPLAY_SWITCHER) {
+        let additionalContainer = document.createElement('div');
+        additionalContainer.classList.add('additional-container');
+        additionalContainer.innerHTML = _.options.wrapper.innerHTML;
+        while (_.options.wrapper.firstChild) {
+            _.options.wrapper.removeChild(_.options.wrapper.firstChild);
+        }
+        _.options.wrapper.appendChild(additionalContainer);
+    }
+
     container = document.createElement('fieldset');
     container.setAttribute('id', _.generateId());
     container.classList.add(_.containerCssClass);
@@ -181,7 +192,7 @@ Duration.prototype.buildWidget = function() {
 Duration.prototype.destroy = function() {
     let _ = this;
 
-    _.container.parentNode.remove(_.container);
+    _.container.parentNode.removeChild(_.container);
     _.source.classList.remove(_.options.cssClass);
 }
 
@@ -294,75 +305,40 @@ Duration.prototype.setupPopup = function() {
 }
 
 Duration.prototype.setupSwitcher = function() {
-    let _ = this, template, oldLabel, oldLabelText, firstId, secondId, switcherId, containerId, originalInputClone;
+    let _ = this, template, firstId, secondId, switcherId, additionalContainer;
 
+    _.additionalContainer = _.options.wrapper.querySelector('.additional-container');
     firstId  = _.generateId();
     secondId = _.generateId();
     switcherId = _.generateId();
-    containerId = _.generateId();
 
-    originalInputClone = _.source.cloneNode();
-
-    oldLabelText = '';
-    if (originalInputClone.hasAttribute('id')) {
-        oldLabel = document.querySelector('[for="' + _.source.getAttribute('id') + '"]');
-        if (oldLabel) {
-            oldLabelText = oldLabel.textContent;
-            oldLabel.style.setProperty('display', 'none');
-        }
-    }
-
-    template = '<fieldset>';
-
-    if (oldLabelText.length > 0) {
-        template += '<legend>' + oldLabelText + '</legend>';
-    }
-
-    template += '<button type="button" class="switcher" id="' + switcherId + '">' +
+    template = '<button type="button" class="switcher" id="' + switcherId + '">' +
                     '<span id="' + firstId + '">' + _.options.switcher.firstLabel +'</span>' +
                     '<span id="' + secondId + '">' + _.options.switcher.secondLabel +'</span>' +
                 '</button>';
 
-    originalInputClone.removeAttribute('id');
-    originalInputClone.setAttribute('aria-describedby', firstId);
-
-    template += originalInputClone.outerHTML;
-
-    template += '<div class="' + _.options.cssClass + '" id="' + containerId + '">' +
-                    '<label>' +
-                        '<span>' + _.options.labels.hours + '</span>' +
-                        '<input type="number" aria-describedby="' + secondId +'">' +
-                    '</label>' +
-                    '<label>' +
-                        '<span>' + _.options.labels.minutes + '</span>' +
-                        '<input type="number" aria-describedby="' + secondId +'">' +
-                    '</label>' +
-                '</div>'
-
-    template += '</fieldset>';
-    _.source.insertAdjacentHTML('afterend', template);
+    _.options.wrapper.insertAdjacentHTML('afterbegin', template);
 
     _.switcher = document.getElementById(switcherId);
-    _.container = document.getElementById(containerId);
 
     if (_.switcherState === _.consts.SWITCHER_STATE_FIRST) {
         _.switcher.lastElementChild.setAttribute('aria-hidden', 'true');
         _.container.style.setProperty('display', 'none');
     } else {
         _.switcher.firstElementChild.setAttribute('aria-hidden', 'true');
-        _.source.style.setProperty('display', 'none');
+        _.additionalContainer.style.setProperty('display', 'none');
     }
 
     _.switcher.addEventListener('click', function(event) {
        if (_.switcherState === _.consts.SWITCHER_STATE_FIRST) {
-           _.source.style.setProperty('display', 'none');
+           _.additionalContainer.style.setProperty('display', 'none');
            _.container.style.removeProperty('display');
            _.switcher.lastElementChild.removeAttribute('aria-hidden');
            _.switcher.firstElementChild.setAttribute('aria-hidden', 'true');
            _.switcher.classList.add(_.consts.SWITCHER_STATE_SECOND);
            _.switcherState = _.consts.SWITCHER_STATE_SECOND;
        } else {
-           _.source.style.removeProperty('display');
+           _.additionalContainer.style.removeProperty('display');
            _.container.style.setProperty('display', 'none');
            _.switcher.lastElementChild.setAttribute('aria-hidden', 'true');
            _.switcher.firstElementChild.removeAttribute('aria-hidden');

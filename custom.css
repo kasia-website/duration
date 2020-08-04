@@ -37,6 +37,7 @@ label input {
     border: 2px solid var(--custom-1);
     display: inline-flex;
     flex-direction: row;
+    margin-top: 0.5rem;
     padding: 0;
     width: 320px;
 }
@@ -93,6 +94,7 @@ label input {
     grid-template-areas: 'label';
     grid-template-columns: max-content;
     line-height: 1rem;
+    margin-bottom: 0;
     padding: 0.25rem 2.25rem;
     position: relative;
     text-transform: initial;
