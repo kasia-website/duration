@@ -1,4 +1,6 @@
-new Duration('#demo-simple', {outputFormat: 'decimal'});
+new Duration('#demo-simple', {
+    outputFormat: 'decimal'
+});
 
 new Duration('#demo-initial-value', {
     initialValue: {

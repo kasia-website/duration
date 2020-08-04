@@ -181,8 +181,67 @@ Duration.prototype.buildWidget = function() {
 Duration.prototype.destroy = function() {
     let _ = this;
 
-    _.container.parentNode.removeChild(_.container);
     _.source.classList.remove(_.options.cssClass);
+
+    switch (_.options.display) {
+        case _.consts.DISPLAY_BOTH:
+            _.destroyBoth()
+            break;
+
+        case _.consts.DISPLAY_WIDGET:
+            _.destroyWidget()
+            break;
+
+        case _.consts.DISPLAY_POPUP:
+            _.destroyPopup();
+            break;
+
+        case _.consts.DISPLAY_SWITCHER:
+            _.destroySwitcher();
+            break;
+    }
+
+    _.source.classList.remove(_.options.cssClass);
+}
+
+Duration.prototype.destroyBoth = function() {
+    let _ = this;
+
+    _.options.wrapper.removeChild(_.container);
+    _.options.wrapper.parentNode.insertBefore(_.options.wrapper.firstElementChild, _.options.wrapper);
+    _.options.wrapper.parentNode.removeChild(_.options.wrapper);
+}
+
+Duration.prototype.destroyPopup = function() {
+    let _ = this;
+
+    _.destroyBoth();
+
+    window.removeEventListener('scroll', _.hidePopup.bind(_));
+    window.removeEventListener('resize', _.hidePopup.bind(_));
+    document.removeEventListener('focus', _.handlePopup.bind(_), true);
+    document.removeEventListener('click', _.handlePopup.bind(_));
+}
+
+Duration.prototype.destroySwitcher = function() {
+    let _ = this;
+
+    _.options.wrapper.removeChild(_.container);
+    _.options.wrapper.removeChild(_.switcher);
+    _.options.wrapper.parentNode.insertBefore(_.options.wrapper.firstElementChild.firstElementChild, _.options.wrapper);
+    _.options.wrapper.parentNode.removeChild(_.options.wrapper);
+}
+
+Duration.prototype.destroyWidget = function() {
+    let _ = this;
+
+    _.destroyBoth();
+
+    if (_.label) {
+        _.label.style.removeProperty('display');
+    }
+
+    _.source.style.removeProperty('display');
 }
 
 Duration.prototype.generateId = function() {
@@ -369,7 +428,7 @@ Duration.prototype.setupWidget = function() {
         _.label.style.setProperty('display', 'none');
     }
 
-    _.source.setAttribute('type', 'hidden');
+    _.source.style.setProperty('display', 'none');
 }
 
 Duration.prototype.setSourceValue = function() {
@@ -501,6 +560,8 @@ Duration.prototype.init = function() {
         _.buildWidget();
         _.setSourceValue();
         _.initializeEvents();
+
+        _.source.classList.add(_.options.cssClass);
 
         _.source.dispatchEvent(new Event('durationinitialized'));
     }
