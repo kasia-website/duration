@@ -98,6 +98,7 @@ let Duration = (function() {
         _.additionalContainer = undefined;
         _.container =  undefined;
         _.containerCssClass = 'duration-container';
+        _.innerContainer = undefined;
         _.hours = undefined;
         _.inputs = [];
         _.label = undefined;
@@ -126,12 +127,12 @@ let Duration = (function() {
         //label wraps input; let's wrap it again to contain label and sibling container for widget
         } else if (_.source.closest('label')){
             _.options.wrapper = document.createElement('div');
-            _.source.closest('label').parentNode.appendChild(_.options.wrapper);
-            _.options.wrapper.appendChild(_.source.closest('label'));
+            _.label.parentNode.insertBefore(_.options.wrapper, _.label);
+            _.options.wrapper.appendChild(_.label);
         //let's wrap input in a div and append widget as sibling
         } else {
             _.options.wrapper = document.createElement('div');
-            _.source.parentNode.appendChild(_.options.wrapper);
+            _.source.parentNode.insertBefore(_.options.wrapper, _.source);
             _.options.wrapper.appendChild(_.source);
         }
 
@@ -142,7 +143,7 @@ let Duration = (function() {
 }());
 
 Duration.prototype.buildWidget = function() {
-    let _ = this, container, innerContainer;
+    let _ = this;
 
     if (_.options.display === _.consts.DISPLAY_SWITCHER) {
         let additionalContainer = document.createElement('div');
@@ -154,21 +155,9 @@ Duration.prototype.buildWidget = function() {
         _.options.wrapper.appendChild(additionalContainer);
     }
 
-    container = document.createElement('fieldset');
-    container.setAttribute('id', _.generateId());
-    container.classList.add(_.containerCssClass);
-    _.container = container;
-    _.options.wrapper.appendChild(_.container);
-
-    innerContainer = document.createElement('div');
-    innerContainer.classList.add('inner-container');
-    _.container.appendChild(innerContainer);
-
+    _.setupContainer()
     _.setupLegend();
-
-    _.options.inputs.forEach(function(period) {
-        _.setupPeriod(period, innerContainer);
-    });
+    _.setupInputs();
 
     switch (_.options.display) {
         case _.consts.DISPLAY_BOTH:
@@ -254,7 +243,30 @@ Duration.prototype.setupBoth = function() {
     }
 }
 
-Duration.prototype.setupPeriod = function(period, container) {
+Duration.prototype.setupContainer = function() {
+    let _ = this, container, innerContainer;
+
+    container = document.createElement('fieldset');
+    container.setAttribute('id', _.generateId());
+    container.classList.add(_.containerCssClass);
+    _.container = container;
+    _.options.wrapper.appendChild(_.container);
+
+    innerContainer = document.createElement('div');
+    innerContainer.classList.add('inner-container');
+    _.innerContainer = innerContainer;
+    _.container.appendChild(innerContainer);
+}
+
+Duration.prototype.setupInputs = function() {
+    let _ = this;
+
+    _.options.inputs.forEach(function(period) {
+        _.setupPeriod(period);
+    });
+}
+
+Duration.prototype.setupPeriod = function(period) {
     let _ = this, periodContainer, periodLabelText, periodInput;
 
     periodContainer = document.createElement('label');
@@ -273,7 +285,7 @@ Duration.prototype.setupPeriod = function(period, container) {
     periodContainer.appendChild(periodInput);
     _.inputs.push(periodInput);
 
-    container.appendChild(periodContainer);
+    _.innerContainer.appendChild(periodContainer);
 }
 
 Duration.prototype.setupLegend = function() {
