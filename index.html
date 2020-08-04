@@ -32,7 +32,9 @@
         <span>How much time do you spend debugging every day?</span>
         <input id="demo-simple" type="number" step="0.01" min="0">
     </label>
-    <pre><code>new Duration('#demo-simple');</code></pre>
+    <pre><code>new Duration('#demo-simple', {
+    outputFormat: 'decimal'
+});</code></pre>
     <figcaption>Text input with duration widget initialized.</figcaption>
 </figure>
 <h3>Preset value</h3>
@@ -44,9 +46,11 @@
     </label>
     <pre><code>new Duration('#demo-initial-value', {
     initialValue: {
-        'minutes': '30',
-        'hours':   '1'
-    }
+        minutes: '30',
+        hours:   '1'
+    },
+    inputs: ['hours', 'minutes', 'seconds'],
+    outputFormat: 'iso'
 });</code></pre>
     <figcaption>Text input with duration widget initialized.</figcaption>
 </figure>
@@ -62,6 +66,7 @@
         minutes: 'minutes',
         hours  : 'hours'
     },
+    outputFormat: 'decimal'
 });</code></pre>
     <figcaption>Text input with duration widget initialized.</figcaption>
 </figure>
@@ -73,7 +78,12 @@
         <input id="demo-widget">
     </label>
     <pre><code>new Duration('#demo-widget', {
-    display: 'widget'
+    display: 'widget',
+    labels: {
+        minutes: 'even longer minutes',
+        hours  : 'long hours'
+    },
+    outputFormat: 'decimal'
 });</code></pre>
     <figcaption>Text input with duration widget initialized.</figcaption>
 </figure>
@@ -85,7 +95,8 @@
         <input id="demo-popup">
     </label>
     <pre><code>new Duration('#demo-popup', {
-    display: 'popup'
+    display: 'popup',
+    outputFormat: 'decimal'
 });</code></pre>
     <figcaption>Text input with duration widget initialized.</figcaption>
 </figure>
@@ -98,9 +109,10 @@
     </label>
     <pre><code>new Duration('#demo-switcher', {
     display: 'switcher',
+    outputFormat: 'decimal',
     switcher: {
-        firstLabel: 'Industriezeit',
-        secondLabel: 'normale Zeit'
+        firstLabel: 'decimal time',
+        secondLabel: 'normal time'
     }
 });</code></pre>
     <figcaption>Text input with duration widget initialized.</figcaption>
@@ -110,38 +122,112 @@
 <li>
     <h3>Setup your HTML.</h3>
     <figure>
+        <pre><code>&lt;input id=&quot;demo&quot;/&gt;</code></pre>
     </figure>
-</li>
-<li>
-    <h3>Move /duration folder into your project.</h3>
-</li>
-<li>
-    <h3>Add duration.css in your head.</h3>
-    <figure>
-    </figure>
+    <p>The input can be a child or a sibling of its label. Label is not obligatory, but definitely a best practise.</p>
 </li>
 <li>
     <h3>Add duration.js before your closing body tag.</h3>
     <figure>
+        <pre><code>&lt;script src=&quot;duration.js&quot;&gt;&lt;/script&gt;</code></pre>
     </figure>
 </li>
 <li>
     <h3>Initialize duration.</h3>
     <figure>
+        <pre><code>new Duration('#demo');</code></pre>
     </figure>
 </li>
 </ol>
-<h3>When complete, your HTML should look something like this:</h3>
-<figure>
-</figure>
 <h2>Settings</h2>
-<ul>
-<li>
-    <p><strong>loremIpsum</strong></p>
-    <p><b>Type:</b> boolean</p>
-    <p><b>Default:</b> false </p>
-    <p>Lorem ipsum</p>
-</li>
+<ul class="list-with-margin">
+    <li>
+        <p><strong>cssClass</strong></p>
+        <p><b>Type:</b> string</p>
+        <p><b>Default:</b> <code>duration-initialized</code></p>
+        <p>Class added to original input after initialization.</p>
+    </li>
+    <li>
+        <p><strong>display</strong></p>
+        <p><b>Type:</b> string</p>
+        <p><b>Default:</b> <code>both</code></p>
+        <p>Indicated widget display. Can take of of the following values:</p>
+        <ul>
+            <li><code>both</code> - original input and the widget are displayed.</li>
+            <li><code>popup</code> - widget is displayed as popup when original input is gets focus.</li>
+            <li><code>switcher</code> - only one of original input and widget is displayed at the same time. Switcher allows to toggle between original input and widget.</li>
+            <li><code>widget</code> - original input is hidden, only widget is displayed.</li>
+        </ul>
+    </li>
+    <li>
+        <p><strong>initialValue</strong></p>
+        <p><b>Type:</b> object</p>
+        <p><b>Default:</b> <pre><code>initialValue: {
+    years:   '0',
+    months:  '0',
+    weeks:   '0',
+    days:    '0',
+    hours:   '0',
+    minutes: '0',
+    seconds: '0'
+    }</code></pre></p>
+        <p>Initial values for generated inputs.</p>
+    </li>
+    <li>
+        <p><strong>inputs</strong></p>
+        <p><b>Type:</b> array</p>
+        <p><b>Default:</b> <code>['years', 'months', 'weeks', 'days', 'hours', 'minutes', 'seconds']</code></p>
+        <p>List of inputs to be generated.</p>
+    </li>
+    <li>
+        <p><strong>labels</strong></p>
+        <p><b>Type:</b> object</p>
+        <p><b>Default:</b> <pre><code>labels: {
+    years:   'yrs',
+    months:  'mo',
+    weeks:   'wks',
+    days:    'days',
+    hours:   'hrs',
+    minutes: 'min',
+    seconds: 'sec'
+    }</code></pre></p>
+        <p>Default labels for generated inputs.</p>
+    </li>
+    <li>
+        <p><strong>outputFormat</strong></p>
+        <p><b>Type:</b> string</p>
+        <p><b>Default:</b> <code>'iso'</code></p>
+        <p>Can be set to <code>iso</code> or <code>decimal</code>.</p>
+    </li>
+    <li>
+        <p><strong>screenReaderText</strong></p>
+        <p><b>Type:</b> string</p>
+        <p><b>Default:</b> <code>'sr-only'</code></p>
+        <p>To avoid duplication for sighted users additional label can be hidden using specified class. Don't use <code>display: none</code> - it breaks accessibility of the widget.</p>
+    </li>
+    <li>
+        <p><strong>switcher</strong></p>
+        <p><b>Type:</b> object</p>
+        <p><b>Default:</b> <pre><code>switcher: {
+    labelShows: 'alternative',
+    firstLabel: 'Switch to input widget',
+    secondLabel: 'Switch to preformatted value input',
+    initialState: 'first'
+    }</code></pre> </p>
+        <p>Values to configure switcher.</p>
+        <ul>
+            <li><code>labelShows</code> can take one of two values: <code>alternative</code> or <code>current</code>. If <code>current</code> is chosen, switcher in on state displays on label and off label in off state. If <code>alternative</code> is chosen, switcher displays the other option's name.</li>
+            <li><code>firstLabel</code> describes switchers on state.</li>
+            <li><code>secondLabel</code> describes switchers off state.</li>
+            <li><code>initialState</code> can be <code>first</code> or <code>second</code> and indicated in which state the swicher should be after initialization.</li>
+        </ul>
+    </li>
+    <li>
+        <p><strong>wrapper</strong></p>
+        <p><b>Type:</b> selector or HTMLElement</p>
+        <p><b>Default:</b> false </p>
+        <p>A wrapper containing original input and widget HTML. If set, given element will be used. If not set wrapping element (<code>div</code>) will be created automatically.</p>
+    </li>
 </ul>
 
 <script src="duration.js"></script>

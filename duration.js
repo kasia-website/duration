@@ -34,15 +34,6 @@ let Duration = (function() {
         _.defaults = {
             cssClass: 'duration-initialized',
             display: _.consts.DISPLAY_BOTH,
-            labels: {
-                years:   'yrs',
-                months:  'mo',
-                weeks:   'wks',
-                days:    'days',
-                hours:   'hrs',
-                minutes: 'min',
-                seconds: 'sec'
-            },
             initialValue: {
                 years:   '0',
                 months:  '0',
@@ -53,6 +44,15 @@ let Duration = (function() {
                 seconds: '0'
             },
             inputs: ['years', 'months', 'weeks', 'days', 'hours', 'minutes', 'seconds'],
+            labels: {
+                years:   'yrs',
+                months:  'mo',
+                weeks:   'wks',
+                days:    'days',
+                hours:   'hrs',
+                minutes: 'min',
+                seconds: 'sec'
+            },
             leadingZeroes: false,
             outputFormat: _.consts.FORMAT_ISO,
             screenReaderText: 'sr-only',
