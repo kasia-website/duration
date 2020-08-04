@@ -55,6 +55,7 @@ let Duration = (function() {
             inputs: ['years', 'months', 'weeks', 'days', 'hours', 'minutes', 'seconds'],
             leadingZeroes: false,
             outputFormat: _.consts.FORMAT_ISO,
+            screenReaderText: 'sr-only',
             switcher: {
                 labelShows: _.consts.SHOWS_ALTERNATIVE,
                 firstLabel: 'Switch to input widget',
@@ -98,6 +99,8 @@ let Duration = (function() {
         _.containerCssClass = 'duration-container';
         _.hours = undefined;
         _.inputs = [];
+        _.label = undefined;
+        _.legend = undefined;
         _.minutes = undefined;
         _.popupVisible = false;
         _.source = element instanceof HTMLElement ? element : document.querySelector(element);
@@ -108,6 +111,11 @@ let Duration = (function() {
                 : _.consts.SWITCHER_STATE_SECOND
             : undefined;
 
+        if (_.source.closest('label')) {
+            _.label = _.source.closest('label');
+        } else if (_.source.hasAttribute('id') && document.querySelector('[for="' + _.source.getAttribute('id') + '"]')) {
+            _.label = document.querySelector('[for="' + _.source.getAttribute('id') + '"]');
+        }
 
         //HTML structure
 
@@ -133,22 +141,31 @@ let Duration = (function() {
 }());
 
 Duration.prototype.buildWidget = function() {
-    let _ = this, container, period;
+    let _ = this, container, innerContainer;
 
-    container = document.createElement('div');
+    container = document.createElement('fieldset');
     container.setAttribute('id', _.generateId());
     container.classList.add(_.containerCssClass);
     _.container = container;
     _.options.wrapper.appendChild(_.container);
 
+    innerContainer = document.createElement('div');
+    innerContainer.classList.add('inner-container');
+    _.container.appendChild(innerContainer);
+
+    _.setupLegend();
+
     _.options.inputs.forEach(function(period) {
-        _.setupPeriod(period);
+        _.setupPeriod(period, innerContainer);
     });
 
-
     switch (_.options.display) {
+        case _.consts.DISPLAY_BOTH:
+            _.setupBoth();
+            break;
+
         case _.consts.DISPLAY_WIDGET:
-            _.source.setAttribute('type', 'hidden');
+            _.setupWidget()
             break;
 
         case _.consts.DISPLAY_POPUP:
@@ -218,47 +235,15 @@ Duration.prototype.initializeEvents = function() {
     document.addEventListener('input', _.handleInput.bind(_));
 }
 
-Duration.prototype.setSourceValue = function() {
-    let _ = this, value;
+Duration.prototype.setupBoth = function() {
+    let _ = this;
 
-    switch(_.options.outputFormat) {
-        case _.consts.FORMAT_DECIMAL:
-            value = '0';
-            _.inputs.forEach(function(input) {
-                if (input.getAttribute('data-designator') === 'H' && input.value > 0) {
-                    value = input.value;
-                }
-                if (input.getAttribute('data-designator') === 'M') {
-                    value += '.' + Math.floor(input.value * 100 / 60);
-                }
-            });
-            break;
-        case _.consts.FORMAT_ISO:
-            value = 'P';
-            const designators = ['Y', 'm', 'W', 'D'];
-            let insertTime = true;
-
-            _.inputs.forEach(function(input) {
-                if (designators.indexOf(input.getAttribute('data-designator')) < 0 && insertTime) {
-                   value += 'T';
-                   insertTime = false;
-                }
-                if (input.value > 0) {
-                    value += input.value + input.getAttribute('data-designator').toUpperCase();
-                }
-            });
-
-            if (value === 'PT') {
-                value += '0S';
-            }
-
-            break;
+    if (_.legend) {
+        _.legend.classList.add(_.options.screenReaderText);
     }
-
-    _.source.value = value;
 }
 
-Duration.prototype.setupPeriod = function(period) {
+Duration.prototype.setupPeriod = function(period, container) {
     let _ = this, periodContainer, periodLabelText, periodInput;
 
     periodContainer = document.createElement('label');
@@ -277,47 +262,32 @@ Duration.prototype.setupPeriod = function(period) {
     periodContainer.appendChild(periodInput);
     _.inputs.push(periodInput);
 
-    _.container.appendChild(periodContainer);
+    container.appendChild(periodContainer);
 }
 
-Duration.prototype.setWidgetValue = function() {
-    let _ = this;
+Duration.prototype.setupLegend = function() {
+    let _ = this, labelText, legend;
 
-    switch(_.options.outputFormat) {
-        case _.consts.FORMAT_DECIMAL:
-            _.updateDecimalWidget();
-            break;
-        case _.consts.FORMAT_ISO:
-            _.updateIsoWidget();
-            break;
-    }
-}
-
-Duration.prototype.showPopup = function() {
-    let _ = this, rect;
-
-    rect = _.source.getBoundingClientRect();
-
-    _.container.style.setProperty('position', 'fixed');
-    _.container.style.setProperty('margin', '0');
-    _.container.style.setProperty('left', rect.left + 'px');
-    _.container.style.setProperty('width', rect.width + 'px');
-    _.container.style.setProperty('top', (+rect.top + +rect.height) + 'px');
-
-    _.container.style.removeProperty('display');
-
-    if (!_.popupVisible) {
-        window.addEventListener('scroll', _.hidePopup.bind(_));
-        window.addEventListener('resize', _.hidePopup.bind(_));
+    if (_.label) {
+        labelText = _.label.textContent.trim();
     }
 
-    _.popupVisible = true;
+    if (labelText.length > 0) {
+        legend = document.createElement('legend')
+        legend.innerText = labelText;
+        _.container.insertAdjacentElement('afterbegin', legend);
+        _.legend = legend;
+    }
 }
 
 Duration.prototype.setupPopup = function() {
     let _ = this;
 
     _.container.style.setProperty('display', 'none');
+
+    if (_.legend) {
+        _.legend.classList.add(_.options.screenReaderText);
+    }
 
     document.addEventListener('focus', _.handlePopup.bind(_), true);
     document.addEventListener('click', _.handlePopup.bind(_));
@@ -402,6 +372,90 @@ Duration.prototype.setupSwitcher = function() {
 
     });
 
+}
+
+Duration.prototype.setupWidget = function() {
+    let _ = this;
+
+    if (_.label) {
+        _.label.style.setProperty('display', 'none');
+    }
+
+    _.source.setAttribute('type', 'hidden');
+}
+
+Duration.prototype.setSourceValue = function() {
+    let _ = this, value;
+
+    switch(_.options.outputFormat) {
+        case _.consts.FORMAT_DECIMAL:
+            value = '0';
+            _.inputs.forEach(function(input) {
+                if (input.getAttribute('data-designator') === 'H' && input.value > 0) {
+                    value = input.value;
+                }
+                if (input.getAttribute('data-designator') === 'M') {
+                    value += '.' + Math.floor(input.value * 100 / 60);
+                }
+            });
+            break;
+        case _.consts.FORMAT_ISO:
+            value = 'P';
+            const designators = ['Y', 'm', 'W', 'D'];
+            let insertTime = true;
+
+            _.inputs.forEach(function(input) {
+                if (designators.indexOf(input.getAttribute('data-designator')) < 0 && insertTime) {
+                    value += 'T';
+                    insertTime = false;
+                }
+                if (input.value > 0) {
+                    value += input.value + input.getAttribute('data-designator').toUpperCase();
+                }
+            });
+
+            if (value === 'PT') {
+                value += '0S';
+            }
+
+            break;
+    }
+
+    _.source.value = value;
+}
+
+Duration.prototype.setWidgetValue = function() {
+    let _ = this;
+
+    switch(_.options.outputFormat) {
+        case _.consts.FORMAT_DECIMAL:
+            _.updateDecimalWidget();
+            break;
+        case _.consts.FORMAT_ISO:
+            _.updateIsoWidget();
+            break;
+    }
+}
+
+Duration.prototype.showPopup = function() {
+    let _ = this, rect;
+
+    rect = _.source.getBoundingClientRect();
+
+    _.container.style.setProperty('position', 'fixed');
+    _.container.style.setProperty('margin', '0');
+    _.container.style.setProperty('left', rect.left + 'px');
+    _.container.style.setProperty('width', rect.width + 'px');
+    _.container.style.setProperty('top', (+rect.top + +rect.height) + 'px');
+
+    _.container.style.removeProperty('display');
+
+    if (!_.popupVisible) {
+        window.addEventListener('scroll', _.hidePopup.bind(_));
+        window.addEventListener('resize', _.hidePopup.bind(_));
+    }
+
+    _.popupVisible = true;
 }
 
 Duration.prototype.updateDecimalWidget = function() {

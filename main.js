@@ -35,7 +35,7 @@ new Duration('#demo-switcher', {
     display: 'switcher',
     outputFormat: 'decimal',
     switcher: {
-        firstLabel: 'Industriezeit',
-        secondLabel: 'normale Zeit'
+        firstLabel: 'decimal time',
+        secondLabel: 'normal time'
     }
 });

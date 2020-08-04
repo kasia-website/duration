@@ -10,6 +10,10 @@ em {
     color: var(--custom-4);
 }
 
+fieldset {
+    padding: 0;
+}
+
 figure {
     border-color: var(--custom-4);
 }
@@ -28,11 +32,18 @@ label input {
     margin-top: 0.5rem;
 }
 
-.duration-container {
+.inner-container {
     background: white;
     border: 2px solid var(--custom-1);
     display: inline-flex;
+    flex-direction: row;
+    padding: 0;
     width: 320px;
+}
+
+.duration-container legend {
+    font-weight: bold;
+    margin: 0;
 }
 
 .duration-container label {
@@ -79,10 +90,10 @@ label input {
     display: inline-grid;
     font-size: 0.85em;
     font-weight: normal;
-    grid-template-areas: 'on label off';
-    grid-template-columns: 1.5rem max-content 1.5rem;
+    grid-template-areas: 'label';
+    grid-template-columns: max-content;
     line-height: 1rem;
-    padding: 0.25rem 0.75rem;
+    padding: 0.25rem 2.25rem;
     position: relative;
     text-transform: initial;
     transition: 0.5s;
@@ -127,8 +138,4 @@ label input {
 
 .switcher + input {
     margin-top: 0;
-}
-
-.duration-container {
-    display: flex;
 }
