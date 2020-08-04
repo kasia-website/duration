@@ -366,6 +366,7 @@ Duration.prototype.setupPopup = function() {
     let _ = this;
 
     _.container.style.setProperty('display', 'none');
+    _.innerContainer.style.setProperty('margin-top', '0');
 
     if (_.legend) {
         _.legend.classList.add(_.options.screenReaderText);
