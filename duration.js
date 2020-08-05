@@ -354,7 +354,7 @@ Duration.prototype.setupLegend = function() {
         labelText = _.label.textContent.trim();
     }
 
-    if (labelText.length > 0) {
+    if (labelText && labelText.length > 0) {
         legend = document.createElement('legend')
         legend.innerText = labelText;
         _.container.insertAdjacentElement('afterbegin', legend);
@@ -470,6 +470,7 @@ Duration.prototype.setSourceValue = function() {
     }
 
     _.source.value = value;
+    _.source.dispatchEvent(new Event('input'));
 }
 
 Duration.prototype.setWidgetValue = function() {
