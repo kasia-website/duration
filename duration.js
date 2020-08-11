@@ -568,3 +568,5 @@ Duration.prototype.init = function() {
         _.source.dispatchEvent(new Event('durationinitialized'));
     }
 }
+
+export default Duration;

@@ -1,0 +1,29 @@
+{
+  "name": "duration-picker",
+  "version": "1.0.0",
+  "description": "javascript helper to input duration in iso or decimal format",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kasia-website/duration.git"
+  },
+  "keywords": [
+    "javascript",
+    "input",
+    "decimal",
+    "time",
+    "picker"
+  ],
+  "author": "kasia",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kasia-website/duration/issues"
+  },
+  "homepage": "https://github.com/kasia-website/duration#readme",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  }
+}
