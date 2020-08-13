@@ -527,10 +527,12 @@ Duration.prototype.updateDecimalWidget = function() {
 
     if (_.inputs[0].getAttribute('data-designator') === _.consts.DESIGNATOR_HOURS) {
         _.inputs[0].value = hours;
+        _.inputs[0].dispatchEvent(new Event('input'));
     }
 
     if (_.inputs[1].getAttribute('data-designator') === _.consts.DESIGNATOR_MINUTES) {
         _.inputs[1].value = Math.floor(minutes * 60);
+        _.inputs[1].dispatchEvent(new Event('input'));
     }
 }
 
@@ -564,6 +566,7 @@ Duration.prototype.updateIsoWidget = function() {
         }
 
         input.value = value;
+        input.dispatchEvent(new Event('input'));
     });
 }
 

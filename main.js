@@ -30,7 +30,8 @@ new Duration('#demo-widget', {
 
 new Duration('#demo-popup', {
     display: 'popup',
-    outputFormat: 'decimal'
+    outputFormat: 'decimal',
+    sizingElement: 'wrapper'
 });
 
 new Duration('#demo-switcher', {
