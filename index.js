@@ -455,7 +455,13 @@ Duration.prototype.setSourceValue = function() {
                     value = input.value;
                 }
                 if (input.getAttribute('data-designator') === 'M') {
-                    value += '.' + Math.floor(input.value * 100 / 60);
+                    value += '.'
+
+                    if (Math.floor(input.value * 100 / 60) < 10) {
+                        value += '0';
+                    }
+
+                    value += Math.floor(input.value * 100 / 60);
                 }
             });
             break;
