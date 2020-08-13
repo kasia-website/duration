@@ -10,19 +10,20 @@
 </head>
 <body>
 <nav>
-<ul>
-<li><a href="#demos">Demos</a></li>
-<li><a href="#usage">Usage</a></li>
-<li><a href="#settings">Settings</a></li>
-<li><a href="#get-it-now">Get it now</a></li>
-</ul>
+    <ul>
+        <li><a href="#demos">Demos</a></li>
+        <li><a href="#usage">Usage</a></li>
+        <li><a href="#settings">Settings</a></li>
+        <li><a href="#get-it-now">Get it now</a></li>
+    </ul>
 </nav>
 <h1>Duration - javascript helper to input duration</h1>
 <h2>Features</h2>
 <ul>
-<li>Feature 1.</li>
-<li>Feature 2.</li>
-<li>Feature 3.</li>
+    <li>Lightweight, dependency-free and customizable.</li>
+    <li>Four display modes: converter, hiding original input, as supporting popup or switcher.</li>
+    <li>Designed as progressive enhancement.</li>
+    <li>Two supported formats: ISO and decimal time.</li>
 </ul>
 <h2>Demos</h2>
 <h3>Simple example</h3>
@@ -170,7 +171,7 @@
     hours:   '0',
     minutes: '0',
     seconds: '0'
-    }</code></pre></p>
+}</code></pre></p>
         <p>Initial values for generated inputs.</p>
     </li>
     <li>
@@ -190,7 +191,7 @@
     hours:   'hrs',
     minutes: 'min',
     seconds: 'sec'
-    }</code></pre></p>
+}</code></pre></p>
         <p>Default labels for generated inputs.</p>
     </li>
     <li>
@@ -206,6 +207,13 @@
         <p>To avoid duplication for sighted users additional label can be hidden using specified class. Don't use <code>display: none</code> - it breaks accessibility of the widget.</p>
     </li>
     <li>
+        <p><strong>sizingElement</strong></p>
+        <p><b>Type:</b> string</p>
+        <p><b>Default:</b> <code>'input'</code></p>
+        <p>Can be set to <code>input</code> or <code>wrapper</code>.</p>
+        <p>Used to size widget when display <code>popup</code> is used. Widget will be positioned and sized correspond to selected element. If no wrapper was given as option default (generated) wrapper will be used.</p>
+    </li>
+    <li>
         <p><strong>switcher</strong></p>
         <p><b>Type:</b> object</p>
         <p><b>Default:</b> <pre><code>switcher: {
@@ -213,7 +221,7 @@
     firstLabel: 'Switch to input widget',
     secondLabel: 'Switch to preformatted value input',
     initialState: 'first'
-    }</code></pre> </p>
+}</code></pre> </p>
         <p>Values to configure switcher.</p>
         <ul>
             <li><code>labelShows</code> can take one of two values: <code>alternative</code> or <code>current</code>. If <code>current</code> is chosen, switcher in on state displays on label and off label in off state. If <code>alternative</code> is chosen, switcher displays the other option's name.</li>
@@ -229,7 +237,24 @@
         <p>A wrapper containing original input and widget HTML. If set, given element will be used. If not set wrapping element (<code>div</code>) will be created automatically.</p>
     </li>
 </ul>
-
+<h2>Methods</h2>
+<ul class="list-with-margin">
+    <li>
+        <p><strong>destroy</strong></p>
+        <p>Removes all custom HTML code and event listeners.</p>
+    </li>
+</ul>
+<h2>Events</h2>
+<ul class="list-with-margin">
+    <li>
+        <p><strong>durationinitialized</strong></p>
+        <p>Fired when all custom HTML code is ready and event listeners got initialized.</p>
+    </li>
+    <li>
+        <p><strong>durationdestroyed</strong></p>
+        <p>Fired after completing destroy action.</p>
+    </li>
+</ul>
 <script src="duration.js"></script>
 <script src="main.js"></script>
 </body>

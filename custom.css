@@ -38,8 +38,9 @@ label input {
     display: inline-flex;
     flex-direction: row;
     margin-top: 0.5rem;
+    max-width: 320px;
     padding: 0;
-    width: 320px;
+    width: 100%;
 }
 
 .duration-container legend {

@@ -1,5 +1,5 @@
 {
-  "name": "duration-picker",
+  "name": "@kasia-website/duration",
   "version": "1.0.0",
   "description": "javascript helper to input duration in iso or decimal format",
   "main": "index.js",

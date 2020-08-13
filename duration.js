@@ -22,6 +22,10 @@ let Duration = (function() {
             FORMAT_DECIMAL: 'decimal',
             FORMAT_ISO:     'iso',
 
+            /* popup sizing */
+            SIZING_INPUT:  'input',
+            SIZING_WRAPPER: 'wrapper',
+
             /* switcher states */
             SWITCHER_STATE_FIRST:  'first',
             SWITCHER_STATE_SECOND: 'second',
@@ -56,6 +60,7 @@ let Duration = (function() {
             leadingZeroes: false,
             outputFormat: _.consts.FORMAT_ISO,
             screenReaderText: 'sr-only',
+            sizingElement: this.consts.SIZING_INPUT,
             switcher: {
                 labelShows: _.consts.SHOWS_ALTERNATIVE,
                 firstLabel: 'Switch to input widget',
@@ -105,6 +110,7 @@ let Duration = (function() {
         _.legend = undefined;
         _.minutes = undefined;
         _.popupVisible = false;
+        _.sizingElement = _.source;
         _.source = element instanceof HTMLElement ? element : document.querySelector(element);
         _.switcher = undefined;
         _.switcherState = _.options.display === _.consts.DISPLAY_SWITCHER
@@ -134,6 +140,10 @@ let Duration = (function() {
             _.options.wrapper = document.createElement('div');
             _.source.parentNode.insertBefore(_.options.wrapper, _.source);
             _.options.wrapper.appendChild(_.source);
+        }
+
+        if (_.options.display === _.consts.DISPLAY_POPUP && _.options.sizingElement === _.consts.SIZING_WRAPPER) {
+            _.sizingElement = _.options.wrapper;
         }
 
         _.init();
@@ -202,6 +212,7 @@ Duration.prototype.destroy = function() {
     }
 
     _.source.classList.remove(_.options.cssClass);
+    _.source.dispatchEvent(new Event('durationdestroyed'));
 }
 
 Duration.prototype.destroyBoth = function() {
@@ -489,7 +500,7 @@ Duration.prototype.setWidgetValue = function() {
 Duration.prototype.showPopup = function() {
     let _ = this, rect;
 
-    rect = _.source.getBoundingClientRect();
+    rect = _.sizingElement.getBoundingClientRect();
 
     _.container.style.setProperty('position', 'fixed');
     _.container.style.setProperty('margin', '0');
@@ -568,5 +579,3 @@ Duration.prototype.init = function() {
         _.source.dispatchEvent(new Event('durationinitialized'));
     }
 }
-
-export default Duration;
