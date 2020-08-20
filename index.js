@@ -93,13 +93,12 @@ let Duration = (function() {
         });
 
         if (_.options.outputFormat === _.consts.FORMAT_DECIMAL) {
-            _.options.inputs = ['hours', 'minutes'];
+            if (!settings.hasOwnProperty('inputs')) {
+                _.options.inputs = ['hours', 'minutes'];
+            }
 
-            if (settings.hasOwnProperty('inputs') && settings.inputs.indexOf('seconds') > -1) {
-                _.options.inputs.push('seconds');
-                if (!settings.hasOwnProperty('precision')) {
-                    _.options.precision = 5;
-                }
+            if (settings.hasOwnProperty('inputs') && settings.inputs.indexOf('seconds') > -1 && !settings.hasOwnProperty('precision')) {
+                _.options.precision = 5;
             }
         }
 
@@ -562,28 +561,30 @@ Duration.prototype.showPopup = function() {
 }
 
 Duration.prototype.updateDecimalWidget = function() {
-    let _ = this, hours, minutes, seconds;
+    let _ = this, hours, minutes, seconds, hoursInput, minutesInput, secondsInput;
 
     hours = Math.floor(_.source.value);
     minutes = _.source.value - hours;
 
-    if (_.inputs[0].getAttribute('data-designator') === _.consts.DESIGNATOR_HOURS) {
-        _.inputs[0].value = hours;
-        _.inputs[0].dispatchEvent(new Event('input'));
+    hoursInput = _.options.wrapper.querySelector('[data-designator="' + _.consts.DESIGNATOR_HOURS +'"]');
+    minutesInput = _.options.wrapper.querySelector('[data-designator="' + _.consts.DESIGNATOR_MINUTES +'"]');
+    secondsInput = _.options.wrapper.querySelector('[data-designator="' + _.consts.DESIGNATOR_SECONDS +'"]');
+
+    if (hoursInput) {
+        hoursInput.value = hours;
+        hoursInput.dispatchEvent(new Event('input'));
     }
 
-    if (_.inputs[1].getAttribute('data-designator') === _.consts.DESIGNATOR_MINUTES) {
-        _.inputs[1].value = Math.floor(minutes * 60);
-        _.inputs[1].dispatchEvent(new Event('input'));
+    if (minutesInput) {
+        minutesInput.value = Math.floor(minutes * 60);
+        minutesInput.dispatchEvent(new Event('input'));
     }
 
-    if (_.options.inputs.indexOf('seconds') > -1) {
+    if (secondsInput) {
         seconds = _.source.value - hours - Math.floor(minutes * 60) / 60;
 
-        if (_.inputs[2].getAttribute('data-designator') === _.consts.DESIGNATOR_SECONDS) {
-            _.inputs[2].value = Math.floor(seconds * 3600);
-            _.inputs[2].dispatchEvent(new Event('input'));
-        }
+        secondsInput.value = Math.floor(seconds * 3600);
+        secondsInput.dispatchEvent(new Event('input'));
     }
 }
 
