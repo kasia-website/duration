@@ -32,6 +32,10 @@ label input {
     margin-top: 0.5rem;
 }
 
+li, p {
+    max-width: 90ch;
+}
+
 .inner-container {
     background: white;
     border: 2px solid var(--custom-1);

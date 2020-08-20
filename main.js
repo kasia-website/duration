@@ -12,11 +12,14 @@ new Duration('#demo-initial-value', {
 });
 
 new Duration('#demo-labels', {
+    inputs: ['hours', 'minutes', 'seconds'],
     labels: {
+        seconds: 'seconds',
         minutes: 'minutes',
         hours  : 'hours'
     },
-    outputFormat: 'decimal'
+    outputFormat: 'decimal',
+    precision: 6
 });
 
 new Duration('#demo-widget', {

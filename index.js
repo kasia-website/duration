@@ -60,6 +60,7 @@ let Duration = (function() {
             },
             leadingZeroes: false,
             outputFormat: _.consts.FORMAT_ISO,
+            precision: 2,
             screenReaderText: 'sr-only',
             sizingElement: this.consts.SIZING_INPUT,
             switcher: {
@@ -93,6 +94,13 @@ let Duration = (function() {
 
         if (_.options.outputFormat === _.consts.FORMAT_DECIMAL) {
             _.options.inputs = ['hours', 'minutes'];
+
+            if (settings.hasOwnProperty('inputs') && settings.inputs.indexOf('seconds') > -1) {
+                _.options.inputs.push('seconds');
+                if (!settings.hasOwnProperty('precision')) {
+                    _.options.precision = 5;
+                }
+            }
         }
 
         if (_.options.display === _.consts.DISPLAY_SWITCHER && _.options.switcher.labelShows === _.consts.SHOWS_CURRENT ) {
@@ -306,6 +314,23 @@ Duration.prototype.initializeEvents = function() {
     document.addEventListener('input', _.handleInput.bind(_));
 }
 
+Duration.prototype.padWithZeroes = function(value) {
+    let _ = this, multiplier, output;
+
+    multiplier = 1;
+    for(let i = 0; i < _.options.precision; i++) {
+        multiplier *= 10;
+    }
+
+    output = Math.floor(value * multiplier);
+
+    while(('' + output).length < _.options.precision) {
+        output = '0' + output;
+    }
+
+    return output;
+}
+
 Duration.prototype.setupBoth = function() {
     let _ = this;
 
@@ -445,29 +470,40 @@ Duration.prototype.setupWidget = function() {
 }
 
 Duration.prototype.setSourceValue = function() {
-    let _ = this, value;
+    let _ = this, value, fraction;
 
     switch(_.options.outputFormat) {
         case _.consts.FORMAT_DECIMAL:
             value = '0';
+            fraction = 0;
             _.inputs.forEach(function(input) {
-                if (input.getAttribute('data-designator') === 'H' && input.value > 0) {
+                if (input.getAttribute('data-designator') === _.consts.DESIGNATOR_HOURS && input.value > 0) {
                     value = input.value;
                 }
-                if (input.getAttribute('data-designator') === 'M') {
+                if (input.getAttribute('data-designator') === _.consts.DESIGNATOR_MINUTES) {
                     value += '.'
 
-                    if (Math.floor(input.value * 100 / 60) < 10) {
-                        value += '0';
+                    if (_.options.inputs.indexOf('seconds') > 0) {
+                        fraction += input.value / 60;
+                    } else {
+                        value += _.padWithZeroes(input.value / 60);
                     }
+                }
+                if (input.getAttribute('data-designator') === _.consts.DESIGNATOR_SECONDS) {
+                    fraction += input.value / 3600;
 
-                    value += Math.floor(input.value * 100 / 60);
+                    value +=  _.padWithZeroes(fraction);
                 }
             });
             break;
         case _.consts.FORMAT_ISO:
             value = 'P';
-            const designators = ['Y', 'm', 'W', 'D'];
+            const designators = [
+                _.consts.DESIGNATOR_YEARS,
+                _.consts.DESIGNATOR_MONTHS,
+                _.consts.DESIGNATOR_WEEKS,
+                _.consts.DESIGNATOR_DAYS
+            ];
             let insertTime = true;
 
             _.inputs.forEach(function(input) {
@@ -526,7 +562,7 @@ Duration.prototype.showPopup = function() {
 }
 
 Duration.prototype.updateDecimalWidget = function() {
-    let _ = this, hours, minutes;
+    let _ = this, hours, minutes, seconds;
 
     hours = Math.floor(_.source.value);
     minutes = _.source.value - hours;
@@ -539,6 +575,15 @@ Duration.prototype.updateDecimalWidget = function() {
     if (_.inputs[1].getAttribute('data-designator') === _.consts.DESIGNATOR_MINUTES) {
         _.inputs[1].value = Math.floor(minutes * 60);
         _.inputs[1].dispatchEvent(new Event('input'));
+    }
+
+    if (_.options.inputs.indexOf('seconds') > -1) {
+        seconds = _.source.value - hours - Math.floor(minutes * 60) / 60;
+
+        if (_.inputs[2].getAttribute('data-designator') === _.consts.DESIGNATOR_SECONDS) {
+            _.inputs[2].value = Math.floor(seconds * 3600);
+            _.inputs[2].dispatchEvent(new Event('input'));
+        }
     }
 }
 

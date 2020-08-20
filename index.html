@@ -63,11 +63,14 @@
         <input id="demo-labels">
     </label>
     <pre><code>new Duration('#demo-labels', {
+    inputs: ['hours', 'minutes', 'seconds'],
     labels: {
+        seconds: 'seconds',
         minutes: 'minutes',
         hours  : 'hours'
     },
-    outputFormat: 'decimal'
+    outputFormat: 'decimal',
+    precision: 6
 });</code></pre>
     <figcaption>Text input with duration widget initialized.</figcaption>
 </figure>
@@ -178,7 +181,7 @@
         <p><strong>inputs</strong></p>
         <p><b>Type:</b> array</p>
         <p><b>Default:</b> <code>['years', 'months', 'weeks', 'days', 'hours', 'minutes', 'seconds']</code></p>
-        <p>List of inputs to be generated.</p>
+        <p>List of inputs to be generated. If you set <code>outputFormat</code> to <code>decimal</code>, only hours and minutes inputs will be generated automatically (days, weeks, months and year are not valid in this context). Use <code>inputs</code> option to decide if you want seconds displayed as well.</p>
     </li>
     <li>
         <p><strong>labels</strong></p>
@@ -199,6 +202,12 @@
         <p><b>Type:</b> string</p>
         <p><b>Default:</b> <code>'iso'</code></p>
         <p>Can be set to <code>iso</code> or <code>decimal</code>.</p>
+    </li>
+    <li>
+        <p><strong>precision</strong></p>
+        <p><b>Type:</b> integer</p>
+        <p><b>Default:</b> <code>2</code>, if <code>inputs</code> contains <code>seconds</code> precision is set to 5</code></p>
+        <p>Precision used by the widget to format computation result. Be cautious with setting it too high to avoid problems with rounding errors.</p>
     </li>
     <li>
         <p><strong>screenReaderText</strong></p>
