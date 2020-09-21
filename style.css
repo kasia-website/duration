@@ -200,6 +200,8 @@ nav ul {
     display: flex;
     justify-content: space-evenly;
     list-style-type: none;
+    padding-left: 0;
+    white-space: nowrap;
 }
 
 nav a {

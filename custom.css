@@ -1,9 +1,14 @@
 :root {
-    --custom-1: #049DBF;
+    --custom-1: #03819D;
     --custom-2: #F2CED1;
     --custom-3: #D93D4A;
     --custom-4: #F2C84B;
     --custom-5: #D98E04;
+}
+
+body {
+    margin: 2vw auto;
+    max-width: 60rem;
 }
 
 em {
@@ -33,7 +38,7 @@ label input {
 }
 
 li, p {
-    max-width: 90ch;
+    max-width: 65ch;
 }
 
 .inner-container {
